@@ -1,0 +1,26 @@
+# man arecord
+# 	http://mocha.freeshell.org/audio.html
+# man sox
+# 	http://sox.sourceforge.net/sox.html
+
+# with sox, normalization
+#$ph = popen("arecord --quiet --format=S16_LE --rate=44100 --channels=1 --duration=30 | sox --type raw --rate 44100 -e unsigned -b 16 -c 1 - --norm --type wav --rate 44100 -e signed -b 16 -c 1 - | lame -x - -", "r");
+
+# with sox, static gain
+#$ph = popen("arecord --nonblock --quiet --format=S16_LE --rate=48000 --channels=1 | sox --type raw --rate 48000 -e unsigned -b 16 -c 1 - --type wav --rate 48000 -e signed -b 16 -c 1 --buffer=1024 - gain 5 | lame -x - -", "r");
+#$ph = popen("arecord --nonblock --quiet --format=cd -c1 | sox --type raw --endian little --rate 44100 -e signed -b 16 -c 1 - --type wav - gain 10 | lame -x - -", "r");
+
+# with ffmpeg 
+# 	https://ffmpeg.org/ffmpeg.html
+# 	https://ffmpeg.org/ffmpeg-filters.html
+# 	https://superuser.com/questions/323119/how-can-i-normalize-audio-using-ffmpeg
+#	https://trac.ffmpeg.org/wiki/Encode/MP3
+#$ph = popen("ffmpeg -f alsa -i hw:0 -f mp3 -ac 1 -c:a libmp3lame -b:a 64k -af 'highpass=f=200,lowpass=f=2000' pipe:1", "r");
+#$ph = popen("ffmpeg -f alsa -i hw:0 -f mp3 -ac 1 -c:a libmp3lame -b:a 64k -af 'dynaudnorm=b=1,highpass=f=200,lowpass=f=2000' pipe:1", "r");
+
+$ph = popen("ffmpeg -f alsa -i hw:0 -f mp3 -c:a libmp3lame -ac 1 -ar 22050 -b:a 32k -af 'highpass=f=300:width_type=h:w=100,lowpass=f=4000,dynaudnorm=f=100:m=50.0:r=1.0:s=30.0' pipe:1", "r");
+
+
+
+# without sox, mp3 gain
+#$ph = popen("arecord --quiet --format=S16_LE --rate=44100 --channels=1 --duration=5 | lame --scale 100 -x - -", "r");
