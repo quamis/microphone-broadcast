@@ -7,11 +7,16 @@ require("AudioFilters.php");
 try {
 	$af = new AudioFilters_hiq();
 	
-	$cmd = \CliCommand::getInstance()->buildCmdStr('ffmpeg -hide_banner -nostats -f alsa -i {source} -f mp3 -c:a libmp3lame -ac {out_channels} -ar {in_frequency} -b:a {out_quality}k -af {filters} pipe:1', [
+	$cmd = \CliCommand::getInstance()->buildCmdStr(
+		 'ffmpeg -loglevel panic -hide_banner -nostats -f alsa -i {source} -f wav -ac {in_channels} -ar {in_frequency} -af {filters} pipe:1 | '
+		.'sox -t wav - -t mp3 - noisered {noiseFile} 0.9 remix - | '
+		.'ffmpeg -loglevel panic -hide_banner -nostats -i pipe:0 -f mp3 -c:a libmp3lame -ac {out_channels} -b:a {out_quality}k pipe:1', [
 			'source' => 		$af->getAudioSource(), 
-			'out_channels' => 	$af->getOutputChannels(), 
+			'in_channels' => 	$af->getSourceChannels(), 
 			'in_frequency' => 	$af->getSourceFrequency(), 
 			'filters' => 		implode(',', $af->getFilters_ffmpeg()),
+			'noiseFile' => 		$af->getNoiseProfile(), 
+			'out_channels' => 	$af->getOutputChannels(), 
 			'out_quality' => 	$af->getOutputQualityKb(), 
 	], null);
 } 

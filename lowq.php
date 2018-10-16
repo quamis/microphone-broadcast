@@ -1,19 +1,27 @@
 <?php
-error_reporting(E_ALL);
+#error_reporting(E_ALL); ini_set('display_errors', 'On');
+
 require("AudioStream.php");
+require("AudioFilters.php");
 
-$source = 'hw:0';
+try {
+	$af = new AudioFilters_lowq();
+	
+	$cmd = \CliCommand::getInstance()->buildCmdStr('ffmpeg -hide_banner -nostats -f alsa -i {source} -f mp3 -c:a libmp3lame -ac {out_channels} -ar {in_frequency} -b:a {out_quality}k -af {filters} pipe:1', [
+			'source' => 		$af->getAudioSource(), 
+			'out_channels' => 	$af->getOutputChannels(), 
+			'in_frequency' => 	$af->getSourceFrequency(), 
+			'filters' => 		implode(',', $af->getFilters_ffmpeg()),
+			'out_quality' => 	$af->getOutputQualityKb(), 
+	], null);
+} 
+catch (\Exception $ex) {
+	echo "<pre>";
+	var_dump($ex->getMessage());
+	echo "</pre>";
+	exit();
+}
 
-$quality = 32;
-$channels = 1;
-$frequency = 22050;
-
-$filters = Array();
-$filters[]= 'highpass=f=300:width_type=h:w=100';
-$filters[]= 'lowpass=f=4000';
-$filters[]= 'dynaudnorm=f=100:m=50.0:r=1.0:s=30.0';
-
-$cmd = sprintf('ffmpeg -loglevel panic -hide_banner -nostats -f alsa -i %s -f mp3 -c:a libmp3lame -ac %d -ar %d -b:a %dk -af \'%s\' pipe:1', $source, $channels, $frequency, $quality, implode(',', $filters));
 
 
 header( 'Pragma: no-cache' );

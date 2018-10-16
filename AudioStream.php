@@ -6,13 +6,10 @@ class AudioStream {
 		$ph = popen($cmd, "r");
 		$idx = 0;
 		while (!feof($ph)) { 
-			if ($idx%10==0) {
+			if ($idx%50) {
 				if (connection_aborted()) {
 					break;
 				}
-			}
-			if ($idx>2000000) {
-				$idx = 0;
 			}
 			
 			echo fread($ph, 2*1024);
