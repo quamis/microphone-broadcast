@@ -6,11 +6,10 @@ require("AudioFilters.php");
 
 try {
 	$af = new AudioFilters_lowq();
-	
 	$cmd = \CliCommand::getInstance()->buildCmdStr(
-		 'ffmpeg -loglevel panic -hide_banner -nostats -f alsa -i {source} -f wav -ac {in_channels} -ar {in_frequency} -af {filters} pipe:1 | '
-		.'sox -t wav - -t mp3 - noisered {noiseFile} 0.9 remix - | '
-		.'ffmpeg -loglevel panic -hide_banner -nostats -i pipe:0 -f mp3 -c:a libmp3lame -ac {out_channels} -b:a {out_quality}k pipe:1', [
+		 'ffmpeg -loglevel panic -hide_banner -nostats -f alsa -i {source} -f wav -ac {in_channels} -ar {in_frequency} pipe:1 | '
+		.'sox -t wav - -t wav - noisered {noiseFile} 0.5 remix 2 | '
+		.'ffmpeg -loglevel panic -hide_banner -nostats -i pipe:0 -f mp3 -c:a libmp3lame -ac {out_channels} -b:a {out_quality} -af {filters} pipe:1', [
 			'source' => 		$af->getAudioSource(), 
 			'in_channels' => 	$af->getSourceChannels(), 
 			'in_frequency' => 	$af->getSourceFrequency(), 

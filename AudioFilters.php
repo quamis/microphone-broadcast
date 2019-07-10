@@ -80,8 +80,8 @@ class AudioFilters_hiq extends AudioFilters {
 class AudioFilters_lowq extends AudioFilters {
 	public function getFilters_ffmpeg() {
 		$filters = [];
-		$filters[]= 'highpass=f=300:width_type=h:w=100';
-		$filters[]= 'lowpass=f=4000';
+		$filters[]= 'highpass=f=400:width_type=h:w=200';
+		$filters[]= 'lowpass=f=6000';
 		$filters[]= 'dynaudnorm=f=100:m=50.0:r=1.0:s=30.0';
 		
 		return $filters;
@@ -106,11 +106,11 @@ class AudioFilters_lowq extends AudioFilters {
 }
 
 abstract class AudioFilters {
-	protected $tmpFile = '/tmp/noise-sample.wav';
-	protected $noiseFile = '/tmp/noise-sample.wav.noiseprofile';
+	protected $tmpFile = 'tmp/noise-sample.wav';
+	protected $noiseFile = 'tmp/noise-sample.wav.noiseprofile';
 	
 	public function getAudioSource() {
-		return 'hw:0';
+		return 'hw:0,0';
 	}
 	
 	public function generateNoiseProfile($timeToSampleNoise=15) {
